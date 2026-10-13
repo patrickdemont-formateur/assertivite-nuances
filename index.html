@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quatre réponses, une posture – version nuancée</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c2430; --muted:#5a6576; --bg:#eef1f4; --paper:#ffffff; --line:#d3d9e1;
+  --F:#4f7196; --Ag:#b3432d; --M:#86589f; --As:#21806a; --focus:#1b5fd1;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.5rem;font-weight:700}
+h3{font-size:1.1rem;font-weight:500}
+p{margin:0 0 .8em}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.muted{color:var(--muted)}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hidden{display:none!important}
+
+/* Accueil */
+.tiles{display:grid;grid-template-columns:repeat(4,22px);gap:5px;margin-bottom:22px}
+.tiles span{width:22px;height:22px;border-radius:5px}
+.intro{max-width:62ch}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:22px}
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:700;margin-bottom:4px}
+.field input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.field .seg label{display:flex;align-items:center;font-weight:400;margin:0;flex:1;min-width:150px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff}
+.field .seg input{width:auto;flex:none;margin:0 10px 0 0;padding:0}
+.seg label:has(input:checked){border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.btn{display:inline-block;border:0;border-radius:10px;padding:12px 20px;background:var(--ink);color:#fff;cursor:pointer;font-weight:700}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.err{color:var(--Ag);font-size:.95rem;min-height:1.4em}
+
+/* Questionnaire */
+.progress{display:grid;grid-template-columns:repeat(16,1fr);gap:4px;margin-bottom:24px}
+.progress i{height:6px;border-radius:3px;background:var(--line)}
+.progress i.done{background:var(--ink)}
+.progress i.now{background:var(--muted)}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px}
+.ctx{font-size:1.15rem;margin:10px 0 20px;max-width:62ch}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;color:var(--ink);transition:border-color .15s}
+.opt:hover{border-color:var(--muted)}
+.opt .l{flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;font-weight:700}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.opt[aria-pressed="true"] .l{background:var(--ink);color:#fff}
+.nav{display:flex;justify-content:space-between;margin-top:22px;gap:10px}
+.hint{font-size:.9rem;margin-top:14px}
+
+/* Résultats */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:12px 0 4px;font-size:.95rem}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend b{display:inline-grid;place-items:center;min-width:30px;height:22px;padding:0 5px;border-radius:5px;color:#fff;font-size:.78rem}
+.mosaic{display:grid;grid-template-columns:minmax(90px,1.1fr) repeat(4,1fr);gap:6px;margin-top:18px}
+.mosaic .ch{font-size:.85rem;color:var(--muted);align-self:end;padding-bottom:2px;text-align:center}
+.mosaic .rh{font-size:.9rem;font-weight:700;align-self:center}
+.cell{aspect-ratio:1/1;border-radius:10px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:8px;font-size:.8rem;border:0;cursor:pointer;text-align:left;transform:scale(.6);opacity:0}
+.cell strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem}
+.reveal .cell{animation:pop .35s ease-out forwards}
+@keyframes pop{to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.cell{transform:none;opacity:1}.reveal .cell{animation:none}}
+.bars{display:grid;gap:10px;margin-top:14px}
+.bar-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:12px;align-items:center;font-size:.95rem}
+.bar{display:flex;height:26px;border-radius:6px;overflow:hidden;background:var(--line)}
+.bar i{display:grid;place-items:center;color:#fff;font-style:normal;font-size:.8rem;font-weight:700}
+.global .bar{height:40px}
+.global .bar i{font-size:.95rem}
+.reading p{max-width:64ch}
+.note{border-left:4px solid var(--muted);padding:6px 0 6px 14px;margin:14px 0;font-size:.95rem;max-width:64ch}
+.compare{border-left:4px solid var(--As);padding:6px 0 6px 14px;margin:14px 0}
+.detail{margin-top:10px}
+.detail li{margin-bottom:10px}
+.tag{display:inline-block;padding:1px 7px;border-radius:5px;color:#fff;font-size:.8rem;font-weight:700;margin-right:6px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+dialog{border:0;border-radius:14px;max-width:520px;padding:22px}
+dialog::backdrop{background:rgba(28,36,48,.45)}
+@media (max-width:560px){
+  body{font-size:16px}
+  .mosaic{grid-template-columns:70px repeat(4,1fr);gap:4px}
+  .cell{padding:5px;font-size:.7rem}
+  .cell strong{font-size:1rem}
+  .bar-row{grid-template-columns:1fr}
+}
+@media print{.actions,.nav{display:none}.cell{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<!-- ACCUEIL -->
+<section id="vAccueil">
+  <div class="tiles" aria-hidden="true" id="tilesDeco"></div>
+  <h1>Quatre réponses,<br>une posture</h1>
+  <p class="muted" style="margin:6px 0 0;font-size:1.1rem">Version nuancée</p>
+  <div class="intro">
+    <p style="margin-top:14px">Seize situations professionnelles, quatre réactions possibles à chaque fois. Choisissez celle qui ressemble le plus à ce que vous feriez vraiment, pas à ce qu'il faudrait faire.</p>
+    <p class="muted">Il n'y a ni bonne ni mauvaise réponse et pas de note. Vous obtiendrez une carte de vos réactions selon l'interlocuteur et la situation. Vous pouvez repasser le questionnaire autant de fois que vous le souhaitez.</p>
+    <p class="note">Il s'agit d'un exercice de réflexion, pas d'un outil de mesure étalonné. Vos réponses illustrent des tendances dans ces situations précises ; elles ne décrivent pas votre personnalité.</p>
+  </div>
+  <div class="panel">
+    <div class="field"><label for="nom">Prénom et nom</label><input id="nom" autocomplete="name"></div>
+    <div class="field"><label for="groupe">Groupe ou session</label><input id="groupe"></div>
+    <div class="field">
+      <label id="pubLbl">Vous répondez en tant que</label>
+      <div class="seg" role="radiogroup" aria-labelledby="pubLbl">
+        <label><input type="radio" name="public" value="m">Manager ou salarié</label>
+        <label><input type="radio" name="public" value="e">Étudiant ou alternant</label>
+      </div>
+    </div>
+    <p class="err" id="errAccueil" role="alert"></p>
+    <button class="btn" id="btnStart">Commencer</button>
+    <button class="btn ghost hidden" id="btnLast" style="margin-left:8px">Voir mon dernier résultat</button>
+  </div>
+</section>
+
+<!-- QUESTIONNAIRE -->
+<section id="vQuiz" class="hidden" aria-live="polite">
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <div class="qhead"><h2 id="qTitle"></h2><span class="muted" id="qMeta"></span></div>
+  <p class="ctx" id="qCtx"></p>
+  <div class="opts" id="qOpts"></div>
+  <div class="nav">
+    <button class="btn ghost" id="btnPrev">Situation précédente</button>
+    <button class="btn" id="btnNext">Situation suivante</button>
+  </div>
+  <p class="hint muted">Astuce : les touches A, B, C et D du clavier fonctionnent aussi.</p>
+</section>
+
+<!-- RÉSULTATS -->
+<section id="vRes" class="hidden">
+  <h1 style="font-size:clamp(1.8rem,5vw,2.6rem)" id="rTitle">Votre carte des postures</h1>
+  <p class="muted" id="rSub"></p>
+  <p class="note">Rappel : ceci est un exercice, pas un outil de mesure étalonné. Votre carte sert de point de départ à l'échange, pas de diagnostic.</p>
+  <div class="legend" id="legend"></div>
+
+  <div class="mosaic" id="mosaic" aria-label="Posture choisie pour chacune des 16 situations"></div>
+  <p class="muted" style="font-size:.9rem;margin-top:8px">Chaque case est une situation. Touchez-la pour relire la situation et votre réponse.</p>
+
+  <div class="panel global">
+    <h3>Répartition sur les 16 situations</h3>
+    <div class="bars" id="barGlobal"></div>
+    <div id="compare"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Selon l'interlocuteur</h3>
+    <div class="bars" id="barInter"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Selon la situation</h3>
+    <div class="bars" id="barType"></div>
+  </div>
+
+  <div class="panel reading">
+    <h3 style="margin-bottom:10px">Pour lire votre carte</h3>
+    <div id="reading"></div>
+  </div>
+
+  <div class="panel" id="detailPanel">
+    <h3>Vos réponses, situation par situation</h3>
+    <ol class="detail" id="detail"></ol>
+  </div>
+
+  <p class="muted" id="sendStatus" style="font-size:.9rem;margin-top:14px"></p>
+  <div class="actions">
+    <button class="btn" id="btnRetake">Repasser le questionnaire</button>
+    <button class="btn ghost" onclick="window.print()">Imprimer ma carte</button>
+  </div>
+</section>
+
+<dialog id="dlg"><div id="dlgBody"></div><p style="margin-top:16px"><button class="btn" onclick="dlg.close()">Fermer</button></p></dialog>
+</main>
+
+<script>
+/* ===================== RÉGLAGES FORMATEUR ===================== */
+const CONFIG = {
+  // URL de l'application Web Apps Script (se termine par /exec). Laisser vide pour ne rien collecter.
+  endpoint: "",
+  // true : le participant voit la posture associée à chacune de ses réponses.
+  afficherDetail: true
+};
+/* ============================================================== */
+
+const POST = {
+  F:  {nom:"Fuite", art:"la fuite", court:"F", c:"var(--F)", intention:"préserver la relation et éviter le conflit", prix:"ses propres besoins passent après ceux des autres"},
+  Ag: {nom:"Agressivité", art:"l'agressivité", court:"Ag", c:"var(--Ag)", intention:"défendre ses intérêts et aller vite", prix:"la relation en pâtit et l'autre se braque"},
+  M:  {nom:"Manipulation", art:"la manipulation", court:"M", c:"var(--M)", intention:"obtenir ce que l'on veut sans affrontement ouvert", prix:"la confiance s'use quand le procédé est découvert"},
+  As: {nom:"Assertivité", art:"l'assertivité", court:"As", c:"var(--As)", intention:"respecter ses besoins et ceux de l'autre, en le disant clairement", prix:"il faut accepter un moment d'inconfort et parfois un désaccord"}
+};
+const ORDER = ["As","F","Ag","M"];
+const INTER = [
+  {id:"H", m:"Hiérarchie", e:"Tuteur, enseignant", rm:"votre hiérarchie", re:"votre tuteur ou vos enseignants"},
+  {id:"P", m:"Collègues", e:"Camarades", rm:"vos collègues", re:"vos camarades"},
+  {id:"E", m:"Mon équipe", e:"Groupe que je coordonne", rm:"votre équipe", re:"le groupe que vous coordonnez"},
+  {id:"X", m:"Clients, fournisseurs", e:"Jury, partenaires, prestataires", rm:"vos clients et fournisseurs", re:"le jury, les partenaires et les prestataires"}
+];
+const TYPES = [
+  {id:"R", l:"Refuser", r:"refuser"}, {id:"D", l:"Demander", r:"demander"}, {id:"C", l:"Critiquer", r:"formuler une critique"}, {id:"RC", l:"Recevoir une critique", r:"recevoir une critique"}
+];
+
+const S = [
+{i:"H",t:"R",
+ m:"Vendredi 17 h, votre N+1 vous demande de reprendre un dossier urgent pour lundi. Vous avez signalé une surcharge la semaine dernière et votre week-end est déjà pris.",
+ e:"Vendredi soir, votre tuteur vous demande de préparer pour lundi une présentation qui n'était pas prévue. Vous lui avez dit la semaine dernière que vous étiez débordé, et votre week-end est déjà pris.",
+ o:[["« Je peux essayer, mais ça risque de retarder le dossier que vous suivez de près. »","M","Refuse sans le dire, en faisant jouer une crainte de l'autre."],
+    ["« Ce week-end, ce n'est pas possible pour moi. Je peux vous livrer une première version lundi à 14 h. »","As","Dit non clairement et propose une alternative concrète."],
+    ["« D'accord, je vais voir ce que je peux avancer d'ici lundi. »","F","Accepte sans exprimer sa contrainte ; « je vais voir » laisse croire à un oui."],
+    ["« Je vous ai signalé ma charge la semaine dernière. Je ne peux pas encore y passer mon week-end. »","Ag","Le refus passe par un reproche, et aucune piste n'est proposée."]]},
+{i:"P",t:"D",
+ m:"Il vous manque les chiffres d'un collègue d'un autre service pour boucler un rapport. Il a déjà deux jours de retard.",
+ e:"Dans un projet de groupe, un camarade n'a toujours pas rendu sa partie. Le rendu approche.",
+ o:[["« J'ai besoin de ta partie aujourd'hui, ça fait deux jours que j'attends. »","Ag","La demande devient une injonction, avec un reproche en appui."],
+    ["« Pas de souci si tu es débordé, envoie-moi ça quand tu pourras. »","F","Renonce au délai dont on a besoin pour ménager l'autre."],
+    ["« J'ai besoin de ta partie jeudi midi pour boucler. C'est faisable pour toi ? »","As","Besoin et échéance clairs, avec une vraie question à l'autre."],
+    ["« On m'a demandé où on en était ; j'ai dit qu'il manquait encore deux ou trois éléments. »","M","Fait pression par un tiers, sans formuler la demande."]]},
+{i:"E",t:"C",
+ m:"Un de vos collaborateurs arrive régulièrement en retard aux réunions d'équipe.",
+ e:"Un membre du groupe que vous coordonnez arrive régulièrement en retard aux séances de travail.",
+ o:[["En début de réunion, vous rappelez à tout le monde l'importance d'être à l'heure.","F","S'adresse au groupe pour éviter le tête-à-tête avec la personne concernée."],
+    ["Vous lui proposez de présenter le point d'ouverture de la prochaine réunion.","M","Obtient la ponctualité par un rôle valorisant, sans nommer le problème."],
+    ["« Encore en retard. Ça commence à devenir un vrai problème, tu en as conscience ? »","Ag","« Encore » et la question rhétorique jugent la personne plus que le fait."],
+    ["En tête-à-tête : « Tu es arrivé après le début des trois dernières réunions. J'ai besoin que tu sois à l'heure. »","As","Fait précis, besoin exprimé, en privé."]]},
+{i:"X",t:"RC",
+ m:"Un client vous reproche vivement un retard de livraison dont votre service est en partie responsable.",
+ e:"Lors d'une soutenance, un membre du jury critique vivement une partie de votre travail.",
+ o:[["« Sur ce point, vous avez raison. Sur le reste, je peux vous expliquer nos choix. »","As","Reconnaît ce qui est fondé et maintient ce qui peut l'être."],
+    ["« Je ne suis pas d'accord : nous avons fait au mieux avec les contraintes du moment. »","Ag","Contredit d'emblée et se justifie avant d'avoir écouté."],
+    ["« Merci, c'est très juste. Nous l'avions d'ailleurs identifié et prévu de le traiter. »","M","Acquiesce en apparence tout en se donnant le beau rôle."],
+    ["« J'entends. Je vais y réfléchir. » Et vous passez à la suite.","F","Clôt l'échange sans répondre sur le fond."]]},
+{i:"H",t:"D",
+ m:"Vous souhaitez obtenir une formation ou une évolution de poste.",
+ e:"Vous souhaitez obtenir un délai supplémentaire ou une lettre de recommandation.",
+ o:[["Vous mentionnez qu'une autre personne vient de l'obtenir.","M","Fait pression par la comparaison au lieu de demander directement."],
+    ["Vous l'évoquez en fin d'entretien, « si un jour l'occasion se présente ».","F","Formule la demande de façon à pouvoir ne rien obtenir."],
+    ["« Je souhaite l'obtenir, pour telle raison. Quand pourrais-je avoir une réponse ? »","As","Demande explicite, argumentée, avec une échéance."],
+    ["« Ça fait un moment que je le demande. J'aimerais que ce soit enfin accepté. »","Ag","« Enfin » transforme la demande en reproche."]]},
+{i:"P",t:"C",
+ m:"En réunion, un collègue présente comme la sienne une idée que vous aviez proposée.",
+ e:"Devant l'enseignant, un camarade présente comme la sienne une idée que vous aviez proposée.",
+ o:[["Après la réunion : « Cette idée, je l'avais proposée mardi. J'aurais aimé que tu le dises. »","As","Dit les faits et son ressenti, sans témoins."],
+    ["En réunion, vous demandez : « C'est proche de la piste de mon mail de mardi, non ? »","M","Une question faussement innocente pour reprendre la paternité de l'idée."],
+    ["Vous vous dites que l'essentiel est que l'idée soit retenue.","F","Rationalise pour ne pas avoir à en parler."],
+    ["« Content que mon idée plaise. La prochaine fois, tu pourras citer ta source. »","Ag","Reproche public, avec une pointe d'ironie."]]},
+{i:"E",t:"R",
+ m:"La veille pour le lendemain, un collaborateur vous demande un jour de congé, en pleine période de clôture.",
+ e:"La veille du rendu, un membre de votre groupe demande à être dispensé de la dernière séance de travail.",
+ o:[["« Non. La règle, c'est de prévenir au moins une semaine avant. »","Ag","La règle sert à fermer la discussion, sans écouter le motif."],
+    ["« Demain, je ne peux pas l'accepter : on a besoin de tout le monde. Voyons pour un autre jour. »","As","Refus motivé, avec une alternative."],
+    ["« Si tu penses que les autres peuvent s'en passer demain, vois avec eux. »","M","Transfère la décision et la culpabilité au groupe."],
+    ["« Bon, d'accord. On s'organisera. »","F","Accepte malgré la contrainte, sans l'exprimer."]]},
+{i:"X",t:"D",
+ m:"Un fournisseur ne respecte pas un engagement prévu au contrat.",
+ e:"Une entreprise contactée pour votre projet ne vous envoie pas les données qu'elle vous avait promises.",
+ o:[["Vous renvoyez un message de relance, semblable au premier.","F","Répète sans augmenter l'exigence, en espérant que cela suffise."],
+    ["Vous l'appelez : rappel de l'engagement, ce que le retard vous coûte, et une date à convenir.","As","Factuel, direct, orienté vers un accord."],
+    ["« Je constate que vos engagements ne sont pas tenus. J'attends un retour sous 24 h. »","Ag","Constat généralisé et ultimatum."],
+    ["Vous laissez entendre qu'une autre solution se présente à vous.","M","Une menace implicite, peut-être fictive."]]},
+{i:"H",t:"C",
+ m:"Votre N+1 change régulièrement les priorités sans prévenir, ce qui désorganise votre équipe.",
+ e:"Votre enseignant a modifié à plusieurs reprises les consignes du projet, ce qui désorganise votre groupe.",
+ o:[["Vous lui demandez de confirmer chaque changement par écrit, « pour être sûr de bien faire ».","M","Une demande anodine qui sert un autre but : garder des traces."],
+    ["« On ne peut pas travailler correctement si tout change sans arrêt. »","Ag","Généralisation (« sans arrêt ») qui met l'autre en accusation."],
+    ["Vous réorganisez le travail à chaque changement, sans en parler.","F","Absorbe le problème plutôt que de le nommer."],
+    ["« Les trois derniers changements nous ont désorganisés. Pourrions-nous faire un point régulier sur les priorités ? »","As","Faits, impact, proposition."]]},
+{i:"P",t:"RC",
+ m:"Devant d'autres personnes, un collègue affirme que votre dernier livrable « n'était pas au niveau ».",
+ e:"Devant le groupe, un camarade affirme que votre partie « n'est pas au niveau ».",
+ o:[["« Pas au niveau ? Tu peux être plus précis, ou c'est une impression ? »","Ag","La question est un défi plutôt qu'une demande sincère."],
+    ["« Merci pour ton retour. Toi qui as l'œil, tu pourrais relire la prochaine version ? »","M","Flatte et renvoie la charge, sans traiter la critique."],
+    ["« Je veux bien ton avis : qu'est-ce qui n'allait pas ? Je préférerais qu'on en parle à deux. »","As","Accueille la critique et pose une limite sur la forme."],
+    ["« Tu as sans doute raison, je regarderai. »","F","Accepte la critique sans savoir sur quoi elle porte."]]},
+{i:"E",t:"D",
+ m:"Vous devez demander à votre équipe un effort supplémentaire pour tenir une échéance.",
+ e:"Chef de projet de votre groupe, vous devez demander à chacun un effort supplémentaire pour tenir le délai.",
+ o:[["Vous expliquez l'enjeu, l'effort attendu et sa durée, et demandez à chacun ce qui est possible.","As","Demande transparente, ouverte aux contraintes."],
+    ["Vous prenez vous-même une partie de la charge pour limiter ce que vous demandez.","F","Compense soi-même pour éviter de demander."],
+    ["« On n'a pas le choix : chacun devra faire le nécessaire. »","Ag","Impose, sans laisser place aux contraintes de chacun."],
+    ["« Ceux qui s'investiront sur ce projet, je saurai m'en souvenir. »","M","Promesse implicite, et sous-entendu pour les autres."]]},
+{i:"X",t:"R",
+ m:"Un client vous demande une prestation supplémentaire gratuite, « pour faire un geste ».",
+ e:"Le commanditaire de votre projet tutoré demande des ajouts qui ne figurent pas dans le cahier des charges.",
+ o:[["« Je vais voir ce qu'on peut faire. »","F","Diffère le refus et laisse espérer."],
+    ["« Ce n'est pas prévu. Si on commence à ajouter des choses, on n'en finira pas. »","Ag","Le refus s'accompagne d'un reproche implicite à l'autre."],
+    ["« Ce n'est pas inclus dans ce qui était convenu. Je peux vous proposer une version simplifiée ou un complément chiffré. »","As","Refus clair, avec des alternatives."],
+    ["Vous acceptez en précisant que « ce sera à garder en tête pour la suite ».","M","Accorde pour créer une dette à réclamer plus tard."]]},
+{i:"H",t:"RC",
+ m:"En entretien, votre N+1 vous reproche un manque d'implication que vous jugez injuste.",
+ e:"Votre tuteur vous reproche un manque d'implication que vous jugez injuste.",
+ o:[["Vous acquiescez, puis vous veillez à ce que votre travail se voie davantage les semaines suivantes.","M","Gère l'image plutôt que de traiter le désaccord."],
+    ["« Je ne partage pas cette appréciation. Pouvez-vous me donner un exemple ? »","As","Exprime le désaccord et demande des faits."],
+    ["« D'accord, je vais faire attention. »","F","Accepte une critique que l'on juge injuste."],
+    ["« Je ne vois pas sur quoi vous vous basez. »","Ag","Conteste la légitimité de l'autre plutôt que le contenu."]]},
+{i:"P",t:"R",
+ m:"Un collègue vous demande, pour la énième fois, de le remplacer en réunion.",
+ e:"Un camarade vous demande, pour la énième fois, vos notes ou votre travail.",
+ o:[["« Encore ? Il faudrait peut-être que tu t'organises un peu. »","Ag","Refus porté par un jugement sur la personne."],
+    ["« D'accord, mais c'est la dernière fois. »","F","Accepte en repoussant le refus à plus tard."],
+    ["Vous invoquez un autre engagement, qui pourrait en réalité être déplacé.","M","Un prétexte remplace le vrai motif."],
+    ["« Cette fois, non. J'ai besoin de ce temps pour mon propre travail. »","As","Non simple, motif personnel assumé."]]},
+{i:"E",t:"RC",
+ m:"Un collaborateur vous reproche de ne pas assez reconnaître le travail de l'équipe.",
+ e:"Un membre du groupe que vous coordonnez vous reproche de tout décider seul.",
+ o:[["« Tu as raison, je vais faire plus attention. » Et vous passez au point suivant.","F","Acquiesce vite pour clore le sujet."],
+    ["« Merci de me le dire. Qu'est-ce qui te fait dire ça ? J'aimerais comprendre. »","As","Accueille et cherche à comprendre avant de répondre."],
+    ["« Merci, c'est utile. Tu pourrais d'ailleurs proposer des idées pour améliorer ça. »","M","Remercie puis renvoie la charge à l'autre."],
+    ["« Je pense au contraire que je le fais régulièrement. »","Ag","Contredit d'emblée, sans explorer."]]},
+{i:"X",t:"C",
+ m:"Un prestataire vous livre un travail non conforme à la commande.",
+ e:"Le prestataire choisi par votre association (imprimeur, traiteur…) livre une commande non conforme.",
+ o:[["« Il y a trois écarts par rapport à la commande. J'ai besoin qu'ils soient corrigés d'ici vendredi. »","As","Faits précis et attente claire."],
+    ["« Ce n'est pas du tout ce qu'on avait demandé. Je ne comprends pas comment c'est possible. »","Ag","Jugement global, sans écart précis."],
+    ["Vous corrigez vous-même ce qui peut l'être et réglez la facture.","F","Prend en charge le problème pour éviter d'en parler."],
+    ["Vous réglez, puis vous négociez une remise sur la commande suivante en rappelant « le petit souci de la dernière fois ».","M","Se sert de l'incident plus tard comme levier."]]}
+];
+
+const L = ["A","B","C","D"];
+const KEY_STATE = "assert4b_state", KEY_HIST = "assert4b_hist";
+
+/* ---------- stockage (protégé si le navigateur le refuse) ---------- */
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+let st = load(KEY_STATE, null) || {nom:"",groupe:"",pub:"",answers:Array(16).fill(null),idx:0,done:false};
+let hist = load(KEY_HIST, []);
+
+const $ = id => document.getElementById(id);
+const show = v => ["vAccueil","vQuiz","vRes"].forEach(x=>$(x).classList.toggle("hidden",x!==v));
+const interLabel = id => { const o=INTER.find(x=>x.id===id); return st.pub==="e"?o.e:o.m; };
+const typeLabel = id => TYPES.find(x=>x.id===id).l;
+const postOf = (n,letterIdx) => S[n].o[letterIdx][1];
+
+/* ---------- accueil ---------- */
+(function deco(){
+  const seq=["As","F","As","M","Ag","As","As","F","M","As","Ag","As","F","As","M","As"];
+  $("tilesDeco").innerHTML=seq.map(p=>`<span style="background:${POST[p].c}"></span>`).join("");
+})();
+function initAccueil(){
+  $("nom").value=st.nom; $("groupe").value=st.groupe;
+  document.querySelectorAll('input[name=public]').forEach(r=>r.checked=(r.value===st.pub));
+  $("btnLast").classList.toggle("hidden",!hist.length);
+  $("btnStart").textContent = st.answers.some(a=>a!==null)&&!st.done ? "Reprendre où j'en étais" : "Commencer";
+  show("vAccueil");
+}
+$("btnStart").onclick=()=>{
+  const nom=$("nom").value.trim(), groupe=$("groupe").value.trim();
+  const pub=(document.querySelector('input[name=public]:checked')||{}).value;
+  if(!nom||!groupe||!pub){$("errAccueil").textContent="Renseignez votre nom, votre groupe et votre situation pour commencer.";return}
+  $("errAccueil").textContent="";
+  Object.assign(st,{nom,groupe,pub});
+  if(st.done){st.answers=Array(16).fill(null);st.idx=0;st.done=false}
+  save(KEY_STATE,st); renderQ(); show("vQuiz");
+};
+$("btnLast").onclick=()=>{ if(hist.length){renderRes(hist[hist.length-1]);show("vRes")} };
+
+/* ---------- questionnaire ---------- */
+function renderQ(){
+  const n=st.idx, s=S[n];
+  $("progress").innerHTML=S.map((_,k)=>`<i class="${st.answers[k]!==null?'done':''} ${k===n?'now':''}"></i>`).join("");
+  $("qTitle").textContent=`Situation ${n+1} sur 16`;
+  $("qMeta").textContent=interLabel(s.i);
+  $("qCtx").textContent=st.pub==="e"?s.e:s.m;
+  $("qOpts").innerHTML=s.o.map((o,k)=>`<button class="opt" data-k="${k}" aria-pressed="${st.answers[n]===k}"><span class="l">${L[k]}</span><span>${o[0]}</span></button>`).join("");
+  $("qOpts").querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(+b.dataset.k));
+  $("btnPrev").disabled=n===0;
+  const last=n===15;
+  $("btnNext").textContent=last?"Voir ma carte":"Situation suivante";
+  $("btnNext").disabled=last?st.answers.some(a=>a===null):st.answers[n]===null;
+}
+let advTimer=null;
+function choose(k){
+  st.answers[st.idx]=k; save(KEY_STATE,st); renderQ();
+  clearTimeout(advTimer);
+  if(st.idx<15) advTimer=setTimeout(()=>{st.idx++;save(KEY_STATE,st);renderQ();$("qTitle").focus?.()},380);
+}
+$("btnPrev").onclick=()=>{clearTimeout(advTimer);if(st.idx>0){st.idx--;save(KEY_STATE,st);renderQ()}};
+$("btnNext").onclick=()=>{
+  clearTimeout(advTimer);
+  if(st.idx<15){if(st.answers[st.idx]!==null){st.idx++;save(KEY_STATE,st);renderQ()}return}
+  const miss=st.answers.findIndex(a=>a===null);
+  if(miss>=0){st.idx=miss;renderQ();return}
+  finish();
+};
+document.addEventListener("keydown",e=>{
+  if($("vQuiz").classList.contains("hidden")||e.target.tagName==="INPUT")return;
+  const k=L.indexOf(e.key.toUpperCase()); if(k>=0)choose(k);
+});
+$("qTitle").tabIndex=-1;
+
+/* ---------- calcul ---------- */
+function compute(answers){
+  const post=answers.map((a,n)=>postOf(n,a));
+  const count=p=>post.filter(x=>x===p).length;
+  const tot={}; ORDER.forEach(p=>tot[p]=count(p));
+  const by=(field,list)=>{const r={};list.forEach(g=>{r[g.id]={F:0,Ag:0,M:0,As:0};S.forEach((s,n)=>{if(s[field]===g.id)r[g.id][post[n]]++})});return r};
+  return {post,tot,inter:by("i",INTER),type:by("t",TYPES)};
+}
+function finish(){
+  const r=compute(st.answers);
+  const rec={date:new Date().toISOString(),nom:st.nom,groupe:st.groupe,pub:st.pub,answers:[...st.answers],tot:r.tot};
+  hist.push(rec); save(KEY_HIST,hist);
+  st.done=true; save(KEY_STATE,st);
+  renderRes(rec); show("vRes"); window.scrollTo(0,0);
+  send(rec,r);
+}
+
+/* ---------- résultats ---------- */
+function barHTML(counts,total){
+  return `<div class="bar" role="img" aria-label="${ORDER.map(p=>POST[p].nom+' '+counts[p]).join(', ')}">`+
+    ORDER.filter(p=>counts[p]>0).map(p=>`<i style="width:${counts[p]/total*100}%;background:${POST[p].c}" title="${POST[p].nom} : ${counts[p]}">${counts[p]}</i>`).join("")+`</div>`;
+}
+function renderRes(rec){
+  st.pub=rec.pub;
+  const r=compute(rec.answers);
+  const nb=hist.indexOf(rec)+1||hist.length;
+  $("rSub").textContent=`${rec.nom}, ${rec.groupe}. Passage n° ${nb}, le ${new Date(rec.date).toLocaleDateString("fr-FR")}`;
+  $("legend").innerHTML=ORDER.map(p=>`<span><b style="background:${POST[p].c}">${POST[p].court}</b>${POST[p].nom}</span>`).join("");
+
+  // mosaïque
+  let h=`<div></div>`+TYPES.map(t=>`<div class="ch">${t.l}</div>`).join("");
+  INTER.forEach((g,gi)=>{
+    h+=`<div class="rh">${interLabel(g.id)}</div>`;
+    TYPES.forEach((t,ti)=>{
+      const n=S.findIndex(s=>s.i===g.id&&s.t===t.id), p=r.post[n];
+      h+=`<button class="cell" style="background:${POST[p].c};animation-delay:${(gi*4+ti)*45}ms" data-n="${n}" aria-label="Situation ${n+1}, ${POST[p].nom}"><span>n° ${n+1}</span><strong>${POST[p].court}</strong></button>`;
+    });
+  });
+  const m=$("mosaic"); m.classList.remove("reveal"); m.innerHTML=h; void m.offsetWidth; m.classList.add("reveal");
+  m.querySelectorAll(".cell").forEach(c=>c.onclick=()=>openSit(+c.dataset.n,rec));
+
+  $("barGlobal").innerHTML=barHTML(r.tot,16);
+  $("barInter").innerHTML=INTER.map(g=>`<div class="bar-row"><span>${interLabel(g.id)}</span>${barHTML(r.inter[g.id],4)}</div>`).join("");
+  $("barType").innerHTML=TYPES.map(t=>`<div class="bar-row"><span>${t.l}</span>${barHTML(r.type[t.id],4)}</div>`).join("");
+
+  // comparaison avec le passage précédent
+  const i=hist.indexOf(rec), prev=i>0?hist[i-1]:null;
+  $("compare").innerHTML=prev?`<p class="compare">Au passage précédent : ${ORDER.map(p=>`${POST[p].nom.toLowerCase()} ${prev.tot[p]}`).join(", ")}.<br>Cette fois : ${ORDER.map(p=>`${POST[p].nom.toLowerCase()} ${rec.tot[p]}`).join(", ")}.</p>`:"";
+
+  $("reading").innerHTML=reading(r);
+
+  $("detailPanel").classList.toggle("hidden",!CONFIG.afficherDetail);
+  if(CONFIG.afficherDetail){
+    $("detail").innerHTML=S.map((s,n)=>{const k=rec.answers[n],p=r.post[n];
+      return `<li><span class="tag" style="background:${POST[p].c}">${POST[p].court}</span><span class="muted">${interLabel(s.i)}, ${typeLabel(s.t).toLowerCase()}</span><br>${L[k]}. ${s.o[k][0]}<br><span class="muted">Indice : ${s.o[k][2]}</span></li>`}).join("");
+  }
+}
+function reading(r){
+  const as=r.tot.As;
+  let t=`<p>Vous avez choisi une réaction assertive dans <strong>${as} situation${as>1?"s":""} sur 16</strong>. `;
+  t+= as>=12 ? "L'assertivité est votre réflexe dominant : l'intérêt est de repérer les quelques cases où vous vous en écartez."
+     : as>=7 ? "L'assertivité fait partie de vos réflexes, mais elle dépend nettement du contexte : c'est précisément ce que votre carte permet de voir."
+     : "Dans beaucoup de situations, un autre réflexe prend le dessus. Ce n'est pas un défaut : chaque posture poursuit une intention, et l'assertivité s'apprend.";
+  t+="</p>";
+  // contextes
+  const rank=(obj,list,lab)=>{const v=list.map(g=>({lab:lab(g),as:obj[g.id].As}));const mx=Math.max(...v.map(x=>x.as)),mn=Math.min(...v.map(x=>x.as));
+    return {hi:v.filter(x=>x.as===mx).map(x=>x.lab),lo:v.filter(x=>x.as===mn).map(x=>x.lab),mx,mn}};
+  const ri=rank(r.inter,INTER,g=>st.pub==="e"?g.re:g.rm), rt=rank(r.type,TYPES,g=>g.r);
+  const j=a=>a.length>1?a.slice(0,-1).join(", ")+" et "+a[a.length-1]:a[0];
+  if(ri.mx!==ri.mn) t+=`<p>Selon l'interlocuteur, c'est avec ${j(ri.hi)} que vous êtes le plus à l'aise, et avec ${j(ri.lo)} que l'assertivité vous coûte le plus.</p>`;
+  else t+=`<p>Votre niveau d'assertivité est le même quel que soit l'interlocuteur.</p>`;
+  if(rt.mx!==rt.mn) t+=`<p>Selon la situation, le plus facile pour vous est de ${j(rt.hi)}, le plus délicat de ${j(rt.lo)}.</p>`;
+  // posture non assertive dominante
+  const others=["F","Ag","M"].filter(p=>r.tot[p]>0).sort((a,b)=>r.tot[b]-r.tot[a]);
+  if(others.length){
+    const p=others[0];
+    t+=`<p>Quand vous n'êtes pas assertif, votre réflexe le plus fréquent est <strong>${POST[p].art}</strong> (${r.tot[p]} fois). Son intention est légitime : ${POST[p].intention}. Son prix : ${POST[p].prix}.</p>`;
+  }
+  t+=`<p>Dans cette version, les frontières entre postures sont volontairement fines. Si le classement d'une de vos réponses vous surprend, lisez l'indice associé : c'est un bon point de départ pour en discuter.</p><p class="muted">Pour progresser, choisissez une case de votre carte qui n'est pas verte et demandez-vous : qu'est-ce que je ressens, de quoi ai-je besoin, qu'est-ce que je pourrais proposer ?</p>`;
+  return t;
+}
+function openSit(n,rec){
+  const s=S[n],k=rec.answers[n],p=postOf(n,k);
+  $("dlgBody").innerHTML=`<h3>Situation ${n+1}</h3><p class="muted">${interLabel(s.i)}, ${typeLabel(s.t).toLowerCase()}</p><p style="margin-top:10px">${st.pub==="e"?s.e:s.m}</p><p><strong>Votre réponse (${L[k]}) :</strong> ${s.o[k][0]}</p><p><span class="tag" style="background:${POST[p].c}">${POST[p].court}</span>${POST[p].nom} : ${POST[p].intention}.</p><p class="muted">Indice : ${s.o[k][2]}</p>`;
+  $("dlg").showModal();
+}
+$("btnRetake").onclick=()=>{st.answers=Array(16).fill(null);st.idx=0;st.done=false;save(KEY_STATE,st);initAccueil()};
+
+/* ---------- envoi vers la feuille Google (facultatif) ---------- */
+function send(rec,r){
+  if(!CONFIG.endpoint){$("sendStatus").textContent="";return}
+  const payload={version:"nuancée",nom:rec.nom,groupe:rec.groupe,public:rec.pub==="e"?"Étudiant":"Manager/salarié",tot:r.tot,
+    asInter:INTER.map(g=>r.inter[g.id].As),asType:TYPES.map(t=>r.type[t.id].As),
+    choix:rec.answers.map((a,n)=>L[a]+" ("+r.post[n]+")")};
+  $("sendStatus").textContent="Envoi de votre carte au formateur…";
+  fetch(CONFIG.endpoint,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)})
+    .then(()=>$("sendStatus").textContent="Votre carte a été transmise au formateur.")
+    .catch(()=>$("sendStatus").textContent="La transmission au formateur a échoué. Votre carte reste affichée ici : prévenez votre formateur.");
+}
+
+/* ---------- démarrage ---------- */
+if(st.done&&hist.length){renderRes(hist[hist.length-1]);show("vRes")}
+else initAccueil();
+</script>
+</body>
+</html>
